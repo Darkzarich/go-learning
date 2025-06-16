@@ -3,9 +3,9 @@ package main
 import "fmt"
 
 func main() {
-	// создаём массив
+	// create array
 	array := [3]int{1, 2, 3}
-	// итерируемся
+	// iterate over array
 	for arrayIndex, arrayValue := range array {
 		fmt.Printf("array[%d]: %d\n", arrayIndex, arrayValue)
 	}
