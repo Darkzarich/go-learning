@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
-	"os"
 	"regexp"
 	"slices"
 	"sort"
@@ -47,14 +47,12 @@ type Lane struct {
 func main() {
 	tasks, err := fetchTasks()
 	if err != nil {
-		fmt.Printf("Error fetching tasks: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error fetching tasks: %v\n", err)
 	}
 
 	lanes, err := fetchLanes()
 	if err != nil {
-		fmt.Printf("Error fetching lanes: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error fetching lanes: %v\n", err)
 	}
 
 	fmt.Println("🗣️🔊 Kaiten tasks by lane priority (from top to bottom) 📅")
