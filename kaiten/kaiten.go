@@ -116,7 +116,7 @@ func fetchTasks() ([]Task, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("%s/cards?column_id=%s&archived=false", KAITEN_API_URL, KAITEN_COLUMN_ID), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s/cards?column_id=%s&archived=false", KAITEN_API_URL, KAITEN_COLUMN_ID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func fetchLanes() ([]Lane, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("%s/boards/%s/lanes", KAITEN_API_URL, KAITEN_BOARD_ID), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s/boards/%s/lanes", KAITEN_API_URL, KAITEN_BOARD_ID), nil)
 	if err != nil {
 		return nil, err
 	}
