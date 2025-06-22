@@ -1,0 +1,19 @@
+{
+  "servers": [
+    {
+      "id": "1",
+      "name": "Server 1",
+      "url": "http://localhost:3001"
+    },
+    {
+      "id": "2",
+      "name": "Server 2",
+      "url": "http://localhost:3002"
+    },
+    {
+      "id": "3",
+      "name": "Server 3",
+      "url": "http://localhost:3003"
+    }
+  ]
+}
