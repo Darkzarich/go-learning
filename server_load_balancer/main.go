@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"server_load_balancer/config"
+	"server_load_balancer/health_checker"
 	"server_load_balancer/load_balancer"
 	"server_load_balancer/pool"
 	"server_load_balancer/strategy"
@@ -24,10 +26,11 @@ func main() {
 
 	lb := load_balancer.NewLoadBalancer(rb)
 
-	distributeRequests(3000, lb)
+	healthChecker := health_checker.NewHealthChecker(10*time.Second, sp)
 
-	// Block main goroutine
-	select {}
+	go healthChecker.CheckHealthPeriodically()
+
+	distributeRequests(3000, lb)
 }
 
 func distributeRequests(port int, lb *load_balancer.LoadBalancer) {
