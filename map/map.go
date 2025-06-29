@@ -65,7 +65,31 @@ func main() {
 		fmt.Printf("Key \"%v\" has value %v\n", key, value)
 	}
 
+	// Exercise 1: Print all products
 	exercise()
+
+	// Exercise 2: Print all pairs of numbers that sum to k
+	exercise2(13)
+
+	// Exercise 3: Return a slice of two integers that sum to k
+	result := exercise3(4)
+
+	fmt.Println(result)
+
+	// Exercise 4: Remove duplicates from a slice of strings
+	words := []string{
+		"cat",
+		"dog",
+		"bird",
+		"bird",
+		"dog",
+		"parrot",
+		"parrot",
+		"cat",
+		"hamster",
+	}
+
+	fmt.Println(RemoveDuplicates(words))
 }
 
 // the small exercise for map
@@ -114,4 +138,51 @@ func exercise() {
 	}
 
 	fmt.Println("Total price of order:", totalPrice)
+}
+
+// Exercise 2: Print all pairs of numbers that sum to k
+func exercise2(k int) {
+	visited := make(map[int]bool)
+	numbers := [...]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}
+
+	for i1, v1 := range numbers {
+		for i2, v2 := range numbers {
+			if v1+v2 == k && !visited[i2] {
+				fmt.Printf("%d (index: %d) + %d (index: %d) = %d\n", v1, i1, v2, i2, v1+v2)
+			}
+		}
+
+		visited[i1] = true
+	}
+}
+
+// Exercise 3: Return a slice of two integers that sum to k
+// if there is no such pair of integers, return empty slice
+func exercise3(k int) []int {
+	m := make(map[int]int)
+	numbers := [...]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}
+
+	for i, v := range numbers {
+		if _, ok := m[k-v]; ok {
+			return []int{v, k - v}
+		}
+		m[v] = i
+	}
+
+	return nil
+}
+
+// Exercise 4: Remove duplicates from a slice of strings
+func RemoveDuplicates(words []string) []string {
+	result := make([]string, 0)
+	seen := make(map[string]bool)
+
+	for _, word := range words {
+		if !seen[word] {
+			seen[word] = true
+			result = append(result, word)
+		}
+	}
+
+	return result
 }
