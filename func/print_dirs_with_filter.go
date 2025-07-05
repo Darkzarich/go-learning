@@ -7,8 +7,22 @@ import (
 	"strings"
 )
 
+// TASK:
+// the same as func/print_dirs.go program but with filter parameter
+// to filter by path and file name
+// Usage: print_dirs_with_filter.go <filter> # for example .png
+
 func main() {
-	PrintFileTreeWithFilter(".", ".png", 0)
+	argsWithoutProg := os.Args[1:]
+
+	if len(argsWithoutProg) == 0 {
+		fmt.Println("Usage: print_dirs_with_filter.go <filter>")
+		os.Exit(1)
+	}
+
+	filter := argsWithoutProg[0]
+
+	PrintFileTreeWithFilter(".", filter, 0)
 }
 
 func PrintFileTreeWithFilter(path string, filter string, level int) {
@@ -23,7 +37,7 @@ func PrintFileTreeWithFilter(path string, filter string, level int) {
 		// Full path to the file
 		fullPath := filepath.Join(path, f.Name())
 
-		if f.Name() == ".git" || !strings.Contains(f.Name(), filter) {
+		if f.Name() == ".git" || !strings.Contains(fullPath, filter) {
 			continue
 		}
 
@@ -32,6 +46,7 @@ func PrintFileTreeWithFilter(path string, filter string, level int) {
 		// Recursively call the function for a directory
 		if f.IsDir() {
 			fmt.Printf("%s├─ 📁 %s\n", levelSeparator, f.Name())
+
 			PrintFileTreeWithFilter(fullPath, filter, level+1)
 		} else {
 			fmt.Printf("%s├─ 📄 %s\n", levelSeparator, f.Name())
