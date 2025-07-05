@@ -8,10 +8,10 @@ import (
 )
 
 func main() {
-	PrintFileTree(".", 0)
+	PrintFileTreeWithFilter(".", ".png", 0)
 }
 
-func PrintFileTree(path string, level int) {
+func PrintFileTreeWithFilter(path string, filter string, level int) {
 	// Getting a list of files
 	files, err := os.ReadDir(path)
 	if err != nil {
@@ -23,7 +23,7 @@ func PrintFileTree(path string, level int) {
 		// Full path to the file
 		fullPath := filepath.Join(path, f.Name())
 
-		if f.Name() == ".git" {
+		if f.Name() == ".git" || !strings.Contains(f.Name(), filter) {
 			continue
 		}
 
@@ -32,7 +32,7 @@ func PrintFileTree(path string, level int) {
 		// Recursively call the function for a directory
 		if f.IsDir() {
 			fmt.Printf("%s├─ 📁 %s\n", levelSeparator, f.Name())
-			PrintFileTree(fullPath, level+1)
+			PrintFileTreeWithFilter(fullPath, filter, level+1)
 		} else {
 			fmt.Printf("%s├─ 📄 %s\n", levelSeparator, f.Name())
 		}
