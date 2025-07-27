@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	ms "sum_module_task/mathslice"
+	ms "sum_slice_module_task/mathslice"
 )
 
 func main() {
