@@ -7,7 +7,7 @@ type User struct {
 	Age  int
 }
 
-func (u *User) SayHi() {
+func (u User) SayHi() {
 	fmt.Println("Hi, my name is", u.Name)
 }
 
