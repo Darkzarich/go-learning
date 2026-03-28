@@ -1,6 +1,6 @@
 /*
-context is widely used in production Go to propagate cancellation across goroutines.
-Under the hood, it often uses a channel to signal done.
+	context is widely used in production Go to propagate cancellation across goroutines.
+	Under the hood, it often uses a channel to signal done.
 */
 
 package main

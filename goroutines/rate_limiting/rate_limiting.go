@@ -1,3 +1,8 @@
+/*
+	Production systems often need to limit the rate of outgoing requests or processing.
+	A channel combined with a time.Ticker makes this straightforward.
+*/
+
 package main
 
 import (

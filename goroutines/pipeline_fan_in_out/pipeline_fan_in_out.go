@@ -1,3 +1,8 @@
+/*
+	A common pattern in data processing systems (e.g., log parsing, image transformation) is to split
+	a stream of data into multiple parallel stages, then combine results.
+*/
+
 package main
 
 import (
