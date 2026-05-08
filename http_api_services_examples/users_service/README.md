@@ -61,5 +61,5 @@ This script will update user with ID 1 to have last_login set to 30 days ago.
 The cron job will remove users who haven't logged in since 30 days every 30 seconds so this script is useful for testing.
 
 ```bash
-go run scripts/make_inactive_last_login.go
+go run scripts/make_inactive_last_login.go <user_id>
 ```

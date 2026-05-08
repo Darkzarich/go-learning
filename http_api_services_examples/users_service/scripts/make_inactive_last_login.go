@@ -3,6 +3,8 @@ package main
 import (
 	"database/sql"
 	"log"
+	"os"
+	"strconv"
 
 	config "users-service/configs"
 
@@ -10,6 +12,16 @@ import (
 )
 
 func main() {
+	args := os.Args[1:]
+	if len(args) != 1 {
+		log.Fatalf("Usage: make_inactive_last_login.go <user_id>")
+	}
+
+	id, err := strconv.ParseInt(args[0], 10, 64)
+	if err != nil {
+		log.Fatalf("invalid user id: %v", err)
+	}
+
 	cfg := config.Load()
 
 	db, err := sql.Open("sqlite3", cfg.DBPath)
@@ -20,7 +32,7 @@ func main() {
 
 	log.Println("Updating last login for user 1")
 
-	result, err := db.Exec("UPDATE users SET last_login = datetime('now', '-30 days') WHERE id = 1")
+	result, err := db.Exec("UPDATE users SET last_login = datetime('now', '-30 days') WHERE id = ?", id)
 	if err != nil {
 		log.Fatalf("did not update last login: %v", err)
 	}
