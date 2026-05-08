@@ -27,6 +27,16 @@ func (h *UserHandler) RegisterRoutes(mux *http.ServeMux) {
 
 func (h *UserHandler) handleUsers(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
+	case http.MethodGet:
+		users, err := h.svc.GetAll()
+		if err != nil {
+			h.writeError(w, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(users)
 	case http.MethodPost:
 		var input struct {
 			Name  string `json:"name"`
@@ -64,13 +74,40 @@ func (h *UserHandler) handleUserByID(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		user, err := h.svc.GetByID(id)
-
 		if err != nil {
 			h.writeError(w, err)
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(user)
+	case http.MethodDelete:
+		err := h.svc.DeleteByID(id)
+		if err != nil {
+			h.writeError(w, err)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+		w.Write([]byte("OK"))
+	case http.MethodPut:
+		var input struct {
+			Name  string `json:"name"`
+			Email string `json:"email"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+			http.Error(w, `{"error":"invalid json"}`, http.StatusBadRequest)
+			return
+		}
+
+		user, err := h.svc.Update(id, input.Name, input.Email)
+		if err != nil {
+			h.writeError(w, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(user)
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
@@ -88,6 +125,8 @@ func (h *UserHandler) writeError(w http.ResponseWriter, err error) {
 			status = http.StatusNotFound
 		case app_error.KindInvalidInput:
 			status = http.StatusBadRequest
+		case app_error.KindAlreadyExists:
+			status = http.StatusConflict
 		}
 		msg = `{"error":"` + ae.Message + `"}`
 	}

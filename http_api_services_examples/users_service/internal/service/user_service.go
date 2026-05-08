@@ -17,6 +17,10 @@ func NewUserService(repo *repository.UserRepo) *UserService {
 	return &UserService{repo: repo}
 }
 
+func (s *UserService) GetAll() ([]*model.User, error) {
+	return s.repo.FindAll()
+}
+
 func (s *UserService) Create(name, email string) (*model.User, error) {
 	// Simple validation / business rules
 	if strings.TrimSpace(name) == "" {
@@ -46,15 +50,20 @@ func (s *UserService) GetByID(id int64) (*model.User, error) {
 	return s.repo.FindByID(id)
 }
 
-func (s *UserService) DeactivateUser(id int64) error {
+func (s *UserService) Update(id int64, name, email string) (*model.User, error) {
 	user, err := s.repo.FindByID(id)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	user.Active = false
+	user.Name = name
+	user.Email = email
 
 	return s.repo.Update(user)
+}
+
+func (s *UserService) DeleteByID(id int64) error {
+	return s.repo.Delete(id)
 }
 
 /*

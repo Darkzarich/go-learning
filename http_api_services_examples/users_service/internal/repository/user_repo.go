@@ -6,6 +6,8 @@ import (
 
 	"users-service/internal/model"
 	"users-service/pkg/app_error"
+
+	"github.com/mattn/go-sqlite3"
 )
 
 type UserRepo struct {
@@ -33,13 +35,42 @@ func (r *UserRepo) InitDatabase() error {
 	return err
 }
 
+func (r *UserRepo) FindAll() ([]*model.User, error) {
+	rows, err := r.db.Query("SELECT id, name, email, active, last_login, created_at FROM users")
+	if err != nil {
+		return nil, app_error.NewInternal(err)
+	}
+	defer rows.Close()
+
+	var users []*model.User
+
+	for rows.Next() {
+		user := &model.User{}
+		err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Active, &user.LastLogin, &user.CreatedAt)
+		if err != nil {
+			return nil, app_error.NewInternal(err)
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
 func (r *UserRepo) Create(user *model.User) error {
 	result, err := r.db.Exec(
 		"INSERT INTO users (name, email, active, last_login) VALUES (?, ?, ?, ?)",
 		user.Name, user.Email, user.Active, user.LastLogin,
 	)
+
 	if err != nil {
-		return app_error.NewInternal(err)
+		if sqliteErr, ok := err.(sqlite3.Error); ok {
+			if sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+				return app_error.NewAlreadyExists("user already exists")
+			}
+		} else {
+			return app_error.NewInternal(err)
+		}
 	}
 
 	id, _ := result.LastInsertId()
@@ -64,16 +95,22 @@ func (r *UserRepo) FindByID(id int64) (*model.User, error) {
 	return user, nil
 }
 
-func (r *UserRepo) Update(user *model.User) error {
+func (r *UserRepo) Update(user *model.User) (*model.User, error) {
 	_, err := r.db.Exec(
 		"UPDATE users SET name = ?, email = ?, active = ?, last_login = ? WHERE id = ?",
 		user.Name, user.Email, user.Active, user.LastLogin, user.ID,
 	)
 	if err != nil {
-		return app_error.NewInternal(err)
+		if sqliteErr, ok := err.(sqlite3.Error); ok {
+			if sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+				return nil, app_error.NewAlreadyExists("user already exists")
+			}
+		} else {
+			return nil, app_error.NewInternal(err)
+		}
 	}
 
-	return nil
+	return user, nil
 }
 
 func (r *UserRepo) Delete(id int64) error {

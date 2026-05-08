@@ -8,6 +8,7 @@ const (
 	KindNotFound Kind = iota
 	KindInvalidInput
 	KindInternal
+	KindAlreadyExists
 )
 
 type AppError struct {
@@ -33,4 +34,8 @@ func NewInvalidInput(msg string) *AppError {
 
 func NewInternal(err error) *AppError {
 	return &AppError{Kind: KindInternal, Message: "internal error", Err: err}
+}
+
+func NewAlreadyExists(msg string) *AppError {
+	return &AppError{Kind: KindAlreadyExists, Message: msg}
 }

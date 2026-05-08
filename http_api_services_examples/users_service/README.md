@@ -14,6 +14,12 @@ make run-api
 make run-cron
 ```
 
+### Running both API and cron jobs
+
+```bash
+make -j2 run-api run-cron
+```
+
 ### Create a user
 
 ```bash
@@ -22,10 +28,30 @@ curl -X POST http://localhost:3000/users \
   -d '{"name":"Alice","email":"alice@example.com"}'
 ```
 
+### Get all users
+
+```bash
+curl http://localhost:3000/users
+```
+
 ### Get a user
 
 ```bash
 curl http://localhost:3000/users/1
+```
+
+### Update a user
+
+```bash
+curl -X PUT http://localhost:3000/users/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Alice","email":"alice@example.com"}'
+```
+
+### Delete a user
+
+```bash
+curl -X DELETE http://localhost:3000/users/1
 ```
 
 ### Set last_login to 30 days ago
