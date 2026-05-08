@@ -6,7 +6,7 @@ import (
 
 	"users-service/internal/model"
 	"users-service/internal/repository"
-	"users-service/pkg/app_error"
+	"users-service/pkg/apperror"
 )
 
 type UserService struct {
@@ -23,12 +23,8 @@ func (s *UserService) GetAll() ([]*model.User, error) {
 
 func (s *UserService) Create(name, email string) (*model.User, error) {
 	// Simple validation / business rules
-	if strings.TrimSpace(name) == "" {
-		return nil, app_error.NewInvalidInput("name is required")
-	}
-
-	if !strings.Contains(email, "@") {
-		return nil, app_error.NewInvalidInput("invalid email format")
+	if strings.HasSuffix(email, "@mailinator.com") {
+		return nil, apperror.NewInvalidInput("disposable emails are not allowed")
 	}
 
 	user := &model.User{

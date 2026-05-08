@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"users-service/internal/model"
-	"users-service/pkg/app_error"
+	"users-service/pkg/apperror"
 
 	"github.com/mattn/go-sqlite3"
 )
@@ -38,7 +38,7 @@ func (r *UserRepo) InitDatabase() error {
 func (r *UserRepo) FindAll() ([]*model.User, error) {
 	rows, err := r.db.Query("SELECT id, name, email, active, last_login, created_at FROM users")
 	if err != nil {
-		return nil, app_error.NewInternal(err)
+		return nil, apperror.NewInternal(err)
 	}
 	defer rows.Close()
 
@@ -48,7 +48,7 @@ func (r *UserRepo) FindAll() ([]*model.User, error) {
 		user := &model.User{}
 		err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Active, &user.LastLogin, &user.CreatedAt)
 		if err != nil {
-			return nil, app_error.NewInternal(err)
+			return nil, apperror.NewInternal(err)
 		}
 
 		users = append(users, user)
@@ -66,10 +66,10 @@ func (r *UserRepo) Create(user *model.User) error {
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok {
 			if sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-				return app_error.NewAlreadyExists("user already exists")
+				return apperror.NewAlreadyExists("user already exists")
 			}
 		} else {
-			return app_error.NewInternal(err)
+			return apperror.NewInternal(err)
 		}
 	}
 
@@ -87,43 +87,61 @@ func (r *UserRepo) FindByID(id int64) (*model.User, error) {
 	).Scan(&user.ID, &user.Name, &user.Email, &user.Active, &user.LastLogin, &user.CreatedAt)
 
 	if err == sql.ErrNoRows {
-		return nil, app_error.NewNotFound("user not found")
+		return nil, apperror.NewNotFound("user not found")
 	} else if err != nil {
-		return nil, app_error.NewInternal(err)
+		return nil, apperror.NewInternal(err)
 	}
 
 	return user, nil
 }
 
 func (r *UserRepo) Update(user *model.User) (*model.User, error) {
-	_, err := r.db.Exec(
+	result, err := r.db.Exec(
 		"UPDATE users SET name = ?, email = ?, active = ?, last_login = ? WHERE id = ?",
 		user.Name, user.Email, user.Active, user.LastLogin, user.ID,
 	)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok {
 			if sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-				return nil, app_error.NewAlreadyExists("user already exists")
+				return nil, apperror.NewAlreadyExists("user already exists")
 			}
 		} else {
-			return nil, app_error.NewInternal(err)
+			return nil, apperror.NewInternal(err)
 		}
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return nil, apperror.NewInternal(err)
+	} else if rowsAffected == 0 {
+		return nil, apperror.NewNotFound("user not found")
 	}
 
 	return user, nil
 }
 
 func (r *UserRepo) Delete(id int64) error {
-	_, err := r.db.Exec("DELETE FROM users WHERE id = ?", id)
-	return err
+	result, err := r.db.Exec("DELETE FROM users WHERE id = ?", id)
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return apperror.NewInternal(err)
+	} else if rowsAffected == 0 {
+		return apperror.NewNotFound("user not found")
+	}
+
+	return nil
 }
 
 // DeleteInactiveBefore deletes users who haven't logged in since 'before'.
 func (r *UserRepo) DeleteInactiveBefore(before time.Time) (int64, error) {
-	res, err := r.db.Exec("DELETE FROM users WHERE last_login < ?", before)
+	result, err := r.db.Exec("DELETE FROM users WHERE last_login < ?", before)
 	if err != nil {
-		return 0, app_error.NewInternal(err)
+		return 0, apperror.NewInternal(err)
 	}
 
-	return res.RowsAffected()
+	return result.RowsAffected()
 }

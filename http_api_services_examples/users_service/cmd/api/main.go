@@ -3,8 +3,8 @@ package main
 import (
 	"database/sql"
 	"log"
-	"net/http"
 
+	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 
 	config "users-service/configs"
@@ -30,9 +30,11 @@ func main() {
 	userSvc := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userSvc)
 
-	mux := http.NewServeMux()
-	userHandler.RegisterRoutes(mux)
+	r := gin.Default()
 
-	log.Printf("API server listening on :%s\n", cfg.Port)
-	log.Fatal(http.ListenAndServe(":"+cfg.Port, mux))
+	userHandler.RegisterRoutes(r)
+
+	if err := r.Run(":3000"); err != nil {
+		log.Fatalf("failed to run server: %v", err)
+	}
 }
