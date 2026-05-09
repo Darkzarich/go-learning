@@ -1,6 +1,15 @@
 # Users HTTP API service with SQLite database.
 
+A simple service I built to learn proper layering in Go. Handlers use services and services use repositories.
+
 ## Usage
+
+This service serves a simple Frontend to create, list, update and delete users. The static files are embedded in the binary and so need to be built before running the service.
+
+```bash
+# need NPM installed
+make build-frontend
+```
 
 ### Run API server
 
@@ -14,11 +23,13 @@ make run-api
 make run-cron
 ```
 
-### Running both API and cron jobs
+### Running both API and cron jobs in parallel
 
 ```bash
 make -j2 run-api run-cron
 ```
+
+## API
 
 ### Create a user
 

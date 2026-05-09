@@ -2,3 +2,4 @@ kaiten/kaiten2
 data.db
 node_modules
 dist
+bin
