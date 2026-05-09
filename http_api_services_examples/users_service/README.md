@@ -23,7 +23,7 @@ make -j2 run-api run-cron
 ### Create a user
 
 ```bash
-curl -X POST http://localhost:3000/users \
+curl -X POST http://localhost:3000/api/users \
   -H "Content-Type: application/json" \
   -d '{"name":"Alice","email":"alice@example.com"}'
 ```
@@ -31,19 +31,19 @@ curl -X POST http://localhost:3000/users \
 ### Get all users
 
 ```bash
-curl http://localhost:3000/users
+curl http://localhost:3000/api/users
 ```
 
 ### Get a user
 
 ```bash
-curl http://localhost:3000/users/1
+curl http://localhost:3000/api/users/1
 ```
 
 ### Update a user
 
 ```bash
-curl -X PUT http://localhost:3000/users/1 \
+curl -X PUT http://localhost:3000/api/users/1 \
   -H "Content-Type: application/json" \
   -d '{"name":"Alice","email":"alice@example.com"}'
 ```
@@ -51,7 +51,7 @@ curl -X PUT http://localhost:3000/users/1 \
 ### Delete a user
 
 ```bash
-curl -X DELETE http://localhost:3000/users/1
+curl -X DELETE http://localhost:3000/api/users/1
 ```
 
 ### Set last_login to 30 days ago

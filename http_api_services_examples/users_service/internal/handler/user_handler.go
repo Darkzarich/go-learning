@@ -20,8 +20,8 @@ func NewUserHandler(svc *service.UserService) *UserHandler {
 }
 
 // RegisterRoutes sets up the HTTP routes on a ServeMux.
-func (h *UserHandler) RegisterRoutes(r *gin.Engine) {
-	users := r.Group("/users")
+func (h *UserHandler) RegisterRoutes(g *gin.RouterGroup) {
+	users := g.Group("/users")
 	users.POST("", h.handleCreateUser)
 	users.GET("", h.handleListUsers)
 	users.GET("/:id", h.handleUserByID)

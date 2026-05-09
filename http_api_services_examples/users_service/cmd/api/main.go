@@ -32,7 +32,9 @@ func main() {
 
 	r := gin.Default()
 
-	userHandler.RegisterRoutes(r)
+	g := r.Group("/api")
+
+	userHandler.RegisterRoutes(g)
 
 	if err := r.Run(":3000"); err != nil {
 		log.Fatalf("failed to run server: %v", err)
