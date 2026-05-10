@@ -1,16 +1,16 @@
 import { deleteUser } from '../../api/users';
-import { useState } from 'react';
+import { useState, type ComponentProps } from 'react';
+import { Button } from '../Button/Button';
 
-interface UserDeleteBtnProps {
+interface UserDeleteBtnProps extends Omit<ComponentProps<'button'>, 'id'> {
   id: number;
   onDeleted: () => void;
-  className?: string;
 }
 
 export const UserDeleteBtn = ({
   id,
   onDeleted,
-  className,
+  ...props
 }: UserDeleteBtnProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -28,12 +28,13 @@ export const UserDeleteBtn = ({
   };
 
   return (
-    <button
-      className={`${className} bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded`}
+    <Button
+      variant="ghost-danger"
       onClick={() => handleDeleteUser(id)}
       disabled={isDeleting}
+      {...props}
     >
       Delete
-    </button>
+    </Button>
   );
 };

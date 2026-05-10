@@ -7,6 +7,7 @@ import {
 } from './components/UserList/UserList';
 import { UserCreate } from './components/UserCreate/UserCreate';
 import type { Value } from './components/UserEditableCell/UserEditableCell';
+import { Button } from './components/Button/Button';
 
 function App() {
   const [users, setUsers] = useState<User[]>([]);
@@ -83,13 +84,9 @@ function App() {
       <div className="flex flex-col gap-6">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <h1 className="text-2xl font-bold">Users</h1>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 disabled:bg-gray-500 text-white font-bold py-2 px-4 rounded cursor-pointer"
-            onClick={fetchUsers}
-            disabled={isFetching}
-          >
+          <Button onClick={fetchUsers} disabled={isFetching}>
             Refresh
-          </button>
+          </Button>
         </div>
 
         <UserCreate onCreated={fetchUsers} />

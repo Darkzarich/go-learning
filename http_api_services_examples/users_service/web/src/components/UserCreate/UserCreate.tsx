@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createUser } from '../../api/users';
 import { AxiosError } from 'axios';
+import { Button } from '../Button/Button';
 
 interface UserCreateProps {
   onCreated: () => void;
@@ -11,6 +12,8 @@ export const UserCreate = ({ onCreated }: UserCreateProps) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isNotFilled = name.trim() === '' || email.trim() === '';
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -53,9 +56,10 @@ export const UserCreate = ({ onCreated }: UserCreateProps) => {
             name="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="border-2 border-gray-500 rounded-md px-2 py-1 w-full sm:w-auto"
+            className="ring-2 ring-gray-500 focus:border-transparent rounded-md px-2 py-1 w-full sm:w-auto outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           />
         </div>
+
         <div className="flex flex-col sm:flex-row sm:items-center gap-2">
           <label htmlFor="email" className="font-bold min-w-14">
             Email
@@ -66,15 +70,11 @@ export const UserCreate = ({ onCreated }: UserCreateProps) => {
             name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="border-2 border-gray-500 rounded-md px-2 py-1 w-full sm:w-auto"
+            className="ring-2 ring-gray-500 border-gray-500 focus:border-transparent rounded-md px-2 py-1 w-full sm:w-auto outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           />
         </div>
-        <button
-          className="bg-blue-500 hover:bg-blue-700 disabled:bg-gray-500 text-white font-bold py-2 px-4 rounded cursor-pointer"
-          disabled={isSubmitting}
-        >
-          Create
-        </button>
+
+        <Button disabled={isSubmitting || isNotFilled}>Create</Button>
       </div>
       {error && <p className="text-red-500">{error}</p>}
     </form>
