@@ -26,3 +26,10 @@ func TestSumNegative(t *testing.T) {
 		t.Error("all arg negative - expected error not be nil")
 	}
 }
+
+func TestSumZero(t *testing.T) {
+	_, err := Sum(0, 0)
+	if err == nil {
+		t.Error("both args zero - expected error not be nil")
+	}
+}
