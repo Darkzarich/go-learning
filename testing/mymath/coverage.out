@@ -1,6 +1,13 @@
 mode: set
+mymath/estimate/estimate.go:3.38,4.9 1 1
+mymath/estimate/estimate.go:5.18,6.17 1 1
+mymath/estimate/estimate.go:8.19,9.18 1 1
+mymath/estimate/estimate.go:11.10,12.15 1 1
 mymath/sum/sum.go:5.33,6.26 1 1
 mymath/sum/sum.go:6.26,8.6 1 1
 mymath/sum/sum.go:10.5,10.23 1 1
 mymath/sum/sum.go:10.23,12.6 1 1
 mymath/sum/sum.go:13.5,13.22 1 1
+mymath/main.go:9.13,12.16 2 0
+mymath/main.go:12.16,15.3 2 0
+mymath/main.go:17.2,21.38 3 0
