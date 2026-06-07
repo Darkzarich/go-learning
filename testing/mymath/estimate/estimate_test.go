@@ -24,4 +24,43 @@ func TestEstimateValue(t *testing.T) {
 
 		assert.Equal(t, "big", result)
 	})
+
+	type args struct {
+		value int
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		// Cases
+		{
+			name: "small",
+			args: args{
+				value: 5,
+			},
+			want: "small",
+		},
+		{
+			name: "medium",
+			args: args{
+				value: 50,
+			},
+			want: "medium",
+		},
+		{
+			name: "big",
+			args: args{
+				value: 100,
+			},
+			want: "big",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := EstimateValue(tt.args.value); got != tt.want {
+				t.Errorf("EstimateValue() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
