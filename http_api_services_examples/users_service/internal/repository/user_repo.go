@@ -10,16 +10,16 @@ import (
 	"github.com/mattn/go-sqlite3"
 )
 
-type UserRepo struct {
+type PostgreSQLUserRepo struct {
 	db *sql.DB
 }
 
-func NewUserRepo(db *sql.DB) *UserRepo {
-	return &UserRepo{db: db}
+func NewUserRepo(db *sql.DB) *PostgreSQLUserRepo {
+	return &PostgreSQLUserRepo{db: db}
 }
 
 // Creates initial database and tables if they don't exist.
-func (r *UserRepo) InitDatabase() error {
+func (r *PostgreSQLUserRepo) InitDatabase() error {
 	query := `
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,7 +35,7 @@ func (r *UserRepo) InitDatabase() error {
 	return err
 }
 
-func (r *UserRepo) FindAll() ([]*model.User, error) {
+func (r *PostgreSQLUserRepo) FindAll() ([]*model.User, error) {
 	rows, err := r.db.Query("SELECT id, name, email, active, last_login, created_at FROM users")
 	if err != nil {
 		return nil, apperror.NewInternal(err)
@@ -57,7 +57,7 @@ func (r *UserRepo) FindAll() ([]*model.User, error) {
 	return users, nil
 }
 
-func (r *UserRepo) Create(user *model.User) error {
+func (r *PostgreSQLUserRepo) Create(user *model.User) error {
 	result, err := r.db.Exec(
 		"INSERT INTO users (name, email, active, last_login) VALUES (?, ?, ?, ?)",
 		user.Name, user.Email, user.Active, user.LastLogin,
@@ -79,7 +79,7 @@ func (r *UserRepo) Create(user *model.User) error {
 	return nil
 }
 
-func (r *UserRepo) FindByID(id int64) (*model.User, error) {
+func (r *PostgreSQLUserRepo) FindByID(id int64) (*model.User, error) {
 	user := &model.User{}
 
 	err := r.db.QueryRow(
@@ -95,7 +95,7 @@ func (r *UserRepo) FindByID(id int64) (*model.User, error) {
 	return user, nil
 }
 
-func (r *UserRepo) Update(user *model.User) (*model.User, error) {
+func (r *PostgreSQLUserRepo) Update(user *model.User) (*model.User, error) {
 	result, err := r.db.Exec(
 		"UPDATE users SET name = ?, email = ?, active = ?, last_login = ? WHERE id = ?",
 		user.Name, user.Email, user.Active, user.LastLogin, user.ID,
@@ -120,7 +120,7 @@ func (r *UserRepo) Update(user *model.User) (*model.User, error) {
 	return user, nil
 }
 
-func (r *UserRepo) Delete(id int64) error {
+func (r *PostgreSQLUserRepo) Delete(id int64) error {
 	result, err := r.db.Exec("DELETE FROM users WHERE id = ?", id)
 	if err != nil {
 		return apperror.NewInternal(err)
@@ -137,7 +137,7 @@ func (r *UserRepo) Delete(id int64) error {
 }
 
 // DeleteInactiveBefore deletes users who haven't logged in since 'before'.
-func (r *UserRepo) DeleteInactiveBefore(before time.Time) (int64, error) {
+func (r *PostgreSQLUserRepo) DeleteInactiveBefore(before time.Time) (int64, error) {
 	result, err := r.db.Exec("DELETE FROM users WHERE last_login < ?", before)
 	if err != nil {
 		return 0, apperror.NewInternal(err)

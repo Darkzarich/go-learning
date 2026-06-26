@@ -5,15 +5,17 @@ import (
 	"time"
 
 	"users-service/internal/model"
-	"users-service/internal/repository"
+	"users-service/internal/domain"
 	"users-service/pkg/apperror"
 )
 
+
+
 type UserService struct {
-	repo *repository.UserRepo
+	repo domain.UserRepository
 }
 
-func NewUserService(repo *repository.UserRepo) *UserService {
+func NewUserService(repo domain.UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
