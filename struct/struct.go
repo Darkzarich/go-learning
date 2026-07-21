@@ -11,6 +11,7 @@ type Person struct {
 	FirstName   string    `json:"firstName"`
 	LastName    string    `json:"lastName"`
 	dateOfBirth time.Time `json:"-"` // This field is ignored by encoding/json
+	Hobbies     []string  `json:"hobbies"`
 }
 
 func NewPerson(name, lastName string, dobYear, dobMonth, dobDay int) (Person, error) {
@@ -36,7 +37,7 @@ func main() {
 		LastName:  "Jones",
 	}
 
-	person3 := Person{"Max", "Jones", time.Date(1990, time.January, 1, 0, 0, 0, 0, time.UTC)}
+	person3 := Person{"Max", "Jones", time.Date(1990, time.January, 1, 0, 0, 0, 0, time.UTC), []string{}}
 
 	// Using constructor function
 	person4, err := NewPerson("Max", "Jones", 1990, 1, 1)
