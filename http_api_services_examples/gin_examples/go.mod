@@ -1,4 +1,4 @@
-module requests
+module gin_examples
 
 go 1.25.5
 

@@ -1,4 +1,4 @@
-package main
+package parameters
 
 import (
 	"fmt"
@@ -6,17 +6,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
-	r := gin.Default()
+func RegisterRoutes(router *gin.Engine) {
+	g := router.Group("/parameters")
 
-	r.GET("/users/:id", func(c *gin.Context) {
+	g.GET("/users/:id", func(c *gin.Context) {
 		id := c.Param("id")
 		c.JSON(200, gin.H{
 			"id": id,
 		})
 	})
 
-	r.POST("/users/:id/*action", func(c *gin.Context) {
+	g.POST("/users/:id/*action", func(c *gin.Context) {
 		id := c.Param("id")
 		action := c.Param("action")
 
@@ -31,11 +31,9 @@ func main() {
 		}
 	})
 
-	r.GET("/users/:id/string", func(c *gin.Context) {
+	g.GET("/users/:id/string", func(c *gin.Context) {
 		id := c.Param("id")
 
 		c.String(200, "User ID: %s", id)
 	})
-
-	r.Run(":3000")
 }

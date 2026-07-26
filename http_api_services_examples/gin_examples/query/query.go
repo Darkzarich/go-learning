@@ -1,4 +1,4 @@
-package main
+package query
 
 import (
 	"strconv"
@@ -6,10 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
-	r := gin.Default()
+func RegisterRoutes(router *gin.Engine) {
+	g := router.Group("/query")
 
-	r.GET("/users", func(c *gin.Context) {
+	g.GET("/users", func(c *gin.Context) {
 		page := c.Query("page")
 		limit := c.Query("limit")
 		sort := c.DefaultQuery("sort", "asc")
@@ -27,6 +27,4 @@ func main() {
 			"sort":  sort,
 		})
 	})
-
-	r.Run(":3000")
 }

@@ -1,13 +1,13 @@
-package main
+package multipart_form
 
 import (
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
-	r := gin.Default()
+func RegisterRoutes(router *gin.Engine) {
+	g := router.Group("/multipart_form")
 
-	r.POST("/test_form", func(c *gin.Context) {
+	g.POST("/test_form", func(c *gin.Context) {
 		message := c.PostForm("message")
 		user := c.DefaultPostForm("user", "anonymous")
 
@@ -17,7 +17,4 @@ func main() {
 			"user":    user,
 		})
 	})
-
-	// To test: curl -X POST -d "message=something&user=me" "localhost:3000/test_form"
-	r.Run(":3000")
 }
