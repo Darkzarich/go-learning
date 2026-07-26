@@ -1,6 +1,8 @@
 package query
 
 import (
+	"fmt"
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -25,6 +27,17 @@ func RegisterRoutes(router *gin.Engine) {
 			"page":  intPage,
 			"limit": intLimit,
 			"sort":  sort,
+		})
+	})
+
+	// QueryMap parses key[subkey]=value pairs from the URL query string.
+	g.GET("/posts", func(c *gin.Context) {
+		filters := c.QueryMap("filters")
+
+		fmt.Printf("filters: %v", filters)
+
+		c.JSON(http.StatusOK, gin.H{
+			"filters": filters,
 		})
 	})
 }

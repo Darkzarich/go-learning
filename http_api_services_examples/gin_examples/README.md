@@ -23,7 +23,9 @@ curl -X POST -w "\nHTTP Status: %{http_code}\n" localhost:3000/parameters/users/
 # query
 curl -X GET "localhost:3000/query/users?page=1&limit=10&sort=asc"
 curl -X GET "localhost:3000/query/users?page=1&limit=10&sort=ascc" # invalid sort, applies default asc
+curl -g -X GET "localhost:3000/query/posts?filters[rating]=5&filters[user]=me" # QueryMap {"filters":{"rating":"5","user":"me"}}
 # multipart_form
 curl -X POST -d "message=something&user=me" "localhost:3000/multipart_form/test_form"
 curl -X POST -d "message=something" "localhost:3000/multipart_form/test_form" # missing user, applies default anonymous
+curl -X POST -d "filters[rating]=5&filters[user]=me" "localhost:3000/multipart_form/posts" # PostFormMap {"filters":{"rating":"5","user":"me"}}
 ```
