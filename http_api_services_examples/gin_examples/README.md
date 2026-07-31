@@ -29,5 +29,5 @@ curl -X POST -d "message=something&user=me" "localhost:3000/multipart_form/test_
 curl -X POST -d "message=something" "localhost:3000/multipart_form/test_form" # missing user, applies default anonymous
 curl -X POST -d "filters[rating]=5&filters[user]=me" "localhost:3000/multipart_form/posts" # PostFormMap {"filters":{"rating":"5","user":"me"}}
 # files
-curl -X POST -F "file=@/home/user/go-basics/http_api_services_examples/gin_examples/files/test.txt" "localhost:3000/files/single/upload"
+curl -X POST -F "file=@/home/user/go-basics/http_api_services_examples/gin_examples/test.txt" "localhost:3000/files/single/upload"
 ```
