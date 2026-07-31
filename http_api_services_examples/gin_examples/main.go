@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 
+	"gin_examples/files"
 	"gin_examples/methods"
 	"gin_examples/multipart_form"
 	"gin_examples/parameters"
@@ -16,6 +17,7 @@ func main() {
 	methods.RegisterRoutes(r)
 	parameters.RegisterRoutes(r)
 	multipart_form.RegisterRoutes(r)
+	files.RegisterRoutes(r)
 
 	r.Run(":3000")
 }
