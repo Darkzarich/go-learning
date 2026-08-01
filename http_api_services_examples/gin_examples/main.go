@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 
 	"gin_examples/files"
@@ -17,7 +19,9 @@ func main() {
 	methods.RegisterRoutes(r)
 	parameters.RegisterRoutes(r)
 	multipart_form.RegisterRoutes(r)
-	files.RegisterRoutes(r)
+	if err := files.RegisterRoutes(r); err != nil {
+		log.Fatal(err)
+	}
 
 	r.Run(":3000")
 }
