@@ -12,6 +12,7 @@ import (
 	"gin_examples/parameters"
 	"gin_examples/query"
 	"gin_examples/redirect"
+	"gin_examples/response"
 )
 
 func main() {
@@ -26,6 +27,7 @@ func main() {
 	}
 	middleware.RegisterRoutes(r)
 	redirect.RegisterRoutes(r)
+	response.RegisterRoutes(r)
 
 	r.Run(":3000")
 }

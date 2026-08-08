@@ -36,5 +36,8 @@ curl http://localhost:3000/middleware/test -H "Token: 123456"
 curl "localhost:3000/redirect/test"
 curl "localhost:3000/redirect/test2"
 curl -X POST "localhost:3000/redirect/test3"
-curl -X POST "localhost:3000/redirect/test4"
+curl -X POST "localhost:3000/redirect/test4"\
+# response - an example of how to make consistent response format (shape) and reduce boilerplate code
+curl "localhost:3000/response/posts/0"
+curl "localhost:3000/response/posts/1"
 ```
