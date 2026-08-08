@@ -11,6 +11,7 @@ import (
 	"gin_examples/multipart_form"
 	"gin_examples/parameters"
 	"gin_examples/query"
+	"gin_examples/redirect"
 )
 
 func main() {
@@ -24,6 +25,7 @@ func main() {
 		log.Fatal(err)
 	}
 	middleware.RegisterRoutes(r)
+	redirect.RegisterRoutes(r)
 
 	r.Run(":3000")
 }
