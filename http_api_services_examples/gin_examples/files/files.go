@@ -118,10 +118,11 @@ func RegisterRoutes(router *gin.Engine) error {
 		fullPath := filepath.Join(pwd, dst)
 
 		c.JSON(http.StatusCreated, gin.H{
-			"filename": header.Filename,
-			"size":     header.Size,
-			"dst":      fullPath,
-			"type":     contentType,
+			"originalName": header.Filename,
+			"filename":     uniqueName,
+			"size":         header.Size,
+			"dst":          fullPath,
+			"type":         contentType,
 		})
 	})
 
