@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"gin_examples/files"
+	"gin_examples/header_versioning"
 	"gin_examples/methods"
 	"gin_examples/middleware"
 	"gin_examples/multipart_form"
@@ -28,6 +29,7 @@ func main() {
 	middleware.RegisterRoutes(r)
 	redirect.RegisterRoutes(r)
 	response.RegisterRoutes(r)
+	header_versioning.RegisterRoutes(r)
 
 	r.Run(":3000")
 }
