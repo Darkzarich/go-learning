@@ -14,6 +14,7 @@ import (
 	"gin_examples/query"
 	"gin_examples/redirect"
 	"gin_examples/response"
+	"gin_examples/custom_error"
 )
 
 func main() {
@@ -30,6 +31,7 @@ func main() {
 	redirect.RegisterRoutes(r)
 	response.RegisterRoutes(r)
 	header_versioning.RegisterRoutes(r)
+	custom_error.RegisterRoutes(r)
 
 	r.Run(":3000")
 }

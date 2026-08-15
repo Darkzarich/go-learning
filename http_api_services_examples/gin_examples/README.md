@@ -43,4 +43,7 @@ curl "localhost:3000/response/posts/1"
 # header_versioning - an example of how to use middleware to handle different versions of API
 curl "localhost:3000/header-versioning/hello"
 curl -H "Accept-Version: v2" "localhost:3000/header-versioning/hello"
+# custom_error - an example of how to use custom error handling middleware
+curl "localhost:3000/custom-error/posts/0"
+curl "localhost:3000/custom-error/posts/1"
 ```
