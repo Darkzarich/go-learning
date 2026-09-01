@@ -44,11 +44,15 @@ func main() {
 		_, err := fmt.Scan(&answer)
 		if err != nil {
 			fmt.Println("Failed to read the answer")
+			guess = guess * 2
+
 			continue
 		}
 
 		if answer != "y" && answer != "l" && answer != "h" {
 			fmt.Print("🤖 Let's try again!\n")
+			guess = guess * 2
+
 			continue
 		}
 
