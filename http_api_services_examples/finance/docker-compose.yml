@@ -1,0 +1,87 @@
+services:
+  emulator:
+    build: ./emulator
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER: kafka:9092
+
+  consumer:
+    build: ./consumer
+  depends_on:
+    kafka:
+      condition: service_healthy
+    storage:
+      condition: service_started
+    environment:
+      KAFKA_BROKER: kafka:9092
+      STORAGE_URL: http://storage:8081
+
+  storage:
+    build: ./storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://testuser:qwerty1234@postgres:5432/intradays?sslmode=disable
+
+  api:
+    build: ./api
+    depends_on:
+      storage:
+        condition: service_started
+    environment:
+      STORAGE_URL: http://storage:8081
+    ports:
+      - '8082:8082'
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: qwerty1234
+      POSTGRES_DB: intradays
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U testuser -d intradays']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  kafka:
+    image: apache/kafka:3.9.0
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1',
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: app-kafka-ui
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - '8080:8080'
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
+volumes:
+  pgdata:
