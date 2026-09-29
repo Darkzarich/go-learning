@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"storage/config"
 	hh "storage/internal/handler/health"
 	hi "storage/internal/handler/intraday"
 	ri "storage/internal/repository/intraday"
@@ -20,39 +21,19 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type Config struct {
-	Addr        string
-	DatabaseURL string
-	Env         string
-}
-
 func main() {
-	cfg, err := loadConfig()
+	cfg, err := config.Load()
 	if err != nil {
 		slog.Error("config load failed", "error", err)
 		os.Exit(1)
 	}
 
+	setupSlogger(cfg.Env)
+
 	if err := run(cfg); err != nil {
 		slog.Error("fatal", "error", err)
 		os.Exit(1)
 	}
-}
-
-func loadConfig() (Config, error) {
-	dsn := os.Getenv("DATABASE_URL")
-	if dsn == "" {
-		return Config{}, errors.New("DATABASE_URL is required")
-	}
-	addr := os.Getenv("HTTP_ADDR")
-	if addr == "" {
-		addr = "8081"
-	}
-	env := os.Getenv("ENV")
-	if env == "" {
-		env = "dev"
-	}
-	return Config{Addr: addr, DatabaseURL: dsn, Env: env}, nil
 }
 
 func setupSlogger(env string) {
@@ -73,12 +54,10 @@ func setupSlogger(env string) {
 	slog.SetDefault(logger)
 }
 
-func run(cfg Config) error {
+func run(cfg config.Config) error {
 	// Graceful shutdown
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-
-	setupSlogger(cfg.Env)
 
 	pgConfig, err := pgxpool.ParseConfig(cfg.DatabaseURL)
 	if err != nil {
