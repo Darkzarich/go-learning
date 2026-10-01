@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"consumer/client/storage"
@@ -56,11 +57,19 @@ func run(cfg config.Config) error {
 
 	intradayConsumer := hi.NewConsumer(cfg, intradayService)
 
-	go intradayConsumer.Run(ctx)
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		intradayConsumer.Run(ctx)
+	}()
 
 	<-ctx.Done()
 
 	slog.Info("Shutting down...")
+
+	wg.Wait()
 
 	return nil
 }

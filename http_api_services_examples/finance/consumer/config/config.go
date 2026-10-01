@@ -27,5 +27,5 @@ func Load() (Config, error) {
 		env = "dev"
 	}
 
-	return Config{KafkaBrokerUrl: KafkaBrokerUrl, Env: env}, nil
+	return Config{KafkaBrokerUrl: KafkaBrokerUrl, StorageUrl: StorageUrl, Env: env}, nil
 }

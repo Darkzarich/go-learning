@@ -34,6 +34,10 @@ func (c *StorageClient) SaveIntraday(ctx context.Context, intraday Intraday) err
 		return fmt.Errorf("send request: %w", err)
 	}
 
+	if resp.StatusCode >= 400 && resp.StatusCode < 500 {
+		return fmt.Errorf("storage status %d: %s", resp.StatusCode, resp.Status)
+	}
+
 	defer resp.Body.Close()
 
 	return nil
