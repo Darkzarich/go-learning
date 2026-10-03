@@ -6,9 +6,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 
 	"consumer/internal/client/storage"
 	"consumer/internal/config"
@@ -57,37 +58,36 @@ func run(cfg config.Config) error {
 
 	httpClient := &http.Client{Timeout: 5 * time.Second}
 
-	Client := storage.NewClient(httpClient, cfg.StorageUrl)
+	client := storage.NewClient(httpClient, cfg.StorageURL)
 
-	intradayService := si.NewService(Client)
+	intradayService := si.NewService(client)
 
-	intradayConsumer := initIntradayConsumer(cfg, intradayService)
+	g, ctx := errgroup.WithContext(ctx)
 
-	var wg sync.WaitGroup
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		intradayConsumer.Run(ctx)
+	intradayConsumer, intradayReader := initIntradayConsumer(cfg, intradayService)
+	defer func() {
+		if err := intradayReader.Close(); err != nil {
+			slog.Error("close intraday reader", "error", err)
+		}
 	}()
 
-	<-ctx.Done()
+	g.Go(func() error { return intradayConsumer.Run(ctx) })
+
+	slog.Info("Consumer started")
+
+	err := g.Wait()
 
 	slog.Info("Shutting down...")
 
-	wg.Wait()
-
-	return nil
+	return err
 }
 
-func initIntradayConsumer(cfg config.Config, intradayService *si.Service) *hi.Consumer {
+func initIntradayConsumer(cfg config.Config, intradayService *si.Service) (*hi.Consumer, *kafka.Reader) {
 	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  []string{cfg.KafkaBrokerUrl},
-		Topic:    "tickers",
-		GroupID:  "consumer",
-		MinBytes: 10e3, // 10KB
-		MaxBytes: 10e6, // 10MB
+		Brokers: []string{cfg.KafkaBrokerURL},
+		Topic:   "tickers",
+		GroupID: "consumer",
 	})
 
-	return hi.NewConsumer(reader, intradayService)
+	return hi.NewConsumer(reader, intradayService), reader
 }

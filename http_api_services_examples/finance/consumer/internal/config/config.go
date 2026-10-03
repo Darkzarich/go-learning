@@ -6,19 +6,19 @@ import (
 )
 
 type Config struct {
-	KafkaBrokerUrl string
-	StorageUrl     string
+	KafkaBrokerURL string
+	StorageURL     string
 	Env            string
 }
 
 func Load() (Config, error) {
-	KafkaBrokerUrl := os.Getenv("KAFKA_BROKER")
-	if KafkaBrokerUrl == "" {
+	kafkaBrokerURL := os.Getenv("KAFKA_BROKER")
+	if kafkaBrokerURL == "" {
 		return Config{}, errors.New("KAFKA_BROKER is required")
 	}
 
-	StorageUrl := os.Getenv("STORAGE_URL")
-	if StorageUrl == "" {
+	storageURL := os.Getenv("STORAGE_URL")
+	if storageURL == "" {
 		return Config{}, errors.New("STORAGE_URL is required")
 	}
 
@@ -27,5 +27,5 @@ func Load() (Config, error) {
 		env = "dev"
 	}
 
-	return Config{KafkaBrokerUrl: KafkaBrokerUrl, StorageUrl: StorageUrl, Env: env}, nil
+	return Config{KafkaBrokerURL: kafkaBrokerURL, StorageURL: storageURL, Env: env}, nil
 }

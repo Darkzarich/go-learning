@@ -1,8 +1,11 @@
 module consumer
 
-go 1.25.5
+go 1.26.0
 
-require github.com/segmentio/kafka-go v0.4.51
+require (
+	github.com/segmentio/kafka-go v0.4.51
+	golang.org/x/sync v0.23.0
+)
 
 require (
 	github.com/klauspost/compress v1.15.9 // indirect

@@ -14,8 +14,8 @@ type IntradayMessage struct {
 
 func (i IntradayMessage) toDomain() di.Intraday {
 	return di.Intraday{
-		Ticker: i.Ticker,
-		Price:  i.Price,
-		Time:   i.Timestamp.Format(time.RFC3339),
+		Ticker:    i.Ticker,
+		Price:     i.Price,
+		Timestamp: i.Timestamp,
 	}
 }

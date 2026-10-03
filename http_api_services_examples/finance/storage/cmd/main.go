@@ -12,7 +12,7 @@ import (
 	"syscall"
 	"time"
 
-	"storage/config"
+	"storage/internal/config"
 	hh "storage/internal/handler/health"
 	hi "storage/internal/handler/intraday"
 	ri "storage/internal/repository/intraday"
@@ -61,14 +61,14 @@ func run(cfg config.Config) error {
 
 	pgConfig, err := pgxpool.ParseConfig(cfg.DatabaseURL)
 	if err != nil {
-		return fmt.Errorf("Parse DB config: %w", err)
+		return fmt.Errorf("parse DB config: %w", err)
 	}
 
 	slog.Info("Connecting to database", "host", pgConfig.ConnConfig.Host, "db", pgConfig.ConnConfig.Database)
 
 	pool, err := pgxpool.NewWithConfig(ctx, pgConfig)
 	if err != nil {
-		return fmt.Errorf("New pool: %w", err)
+		return fmt.Errorf("new pool: %w", err)
 	}
 	defer pool.Close()
 
