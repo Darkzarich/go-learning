@@ -10,15 +10,15 @@ import (
 	di "consumer/internal/domain/intraday"
 )
 
-type StorageClientImpl struct {
+type ClientImpl struct {
 	baseURL string
 }
 
-func NewStorageClient(url string) StorageClient {
-	return &StorageClientImpl{baseURL: url}
+func NewClient(url string) *ClientImpl {
+	return &ClientImpl{baseURL: url}
 }
 
-func (c *StorageClientImpl) SaveIntraday(ctx context.Context, intraday di.Intraday) error {
+func (c *ClientImpl) SaveIntraday(ctx context.Context, intraday di.Intraday) error {
 	data, err := json.Marshal(intraday)
 	if err != nil {
 		return fmt.Errorf("marshal intraday: %w", err)

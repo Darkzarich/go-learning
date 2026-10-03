@@ -7,8 +7,6 @@ import (
 	"io"
 	"log/slog"
 
-	"consumer/internal/config"
-
 	kafka "github.com/segmentio/kafka-go"
 
 	di "consumer/internal/domain/intraday"
@@ -23,16 +21,10 @@ type Consumer struct {
 	svc    IIntradayService
 }
 
-func NewConsumer(cfg config.Config, svc IIntradayService) *Consumer {
+func NewConsumer(reader *kafka.Reader, svc IIntradayService) *Consumer {
 	return &Consumer{
-		reader: kafka.NewReader(kafka.ReaderConfig{
-			Brokers:  []string{cfg.KafkaBrokerUrl},
-			Topic:    "tickers",
-			GroupID:  "consumer",
-			MinBytes: 10e3, // 10KB
-			MaxBytes: 10e6, // 10MB
-		}),
-		svc: svc,
+		reader: reader,
+		svc:    svc,
 	}
 }
 

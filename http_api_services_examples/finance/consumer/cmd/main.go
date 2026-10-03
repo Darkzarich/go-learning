@@ -12,6 +12,8 @@ import (
 	"consumer/internal/config"
 	hi "consumer/internal/handler/kafka/intraday"
 	si "consumer/internal/service/intraday"
+
+	"github.com/segmentio/kafka-go"
 )
 
 func main() {
@@ -51,11 +53,11 @@ func run(cfg config.Config) error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	storageClient := storage.NewStorageClient(cfg.StorageUrl)
+	Client := storage.NewClient(cfg.StorageUrl)
 
-	intradayService := si.NewService(storageClient)
+	intradayService := si.NewService(Client)
 
-	intradayConsumer := hi.NewConsumer(cfg, intradayService)
+	intradayConsumer := initIntradayConsumer(cfg, intradayService)
 
 	var wg sync.WaitGroup
 
@@ -72,4 +74,16 @@ func run(cfg config.Config) error {
 	wg.Wait()
 
 	return nil
+}
+
+func initIntradayConsumer(cfg config.Config, intradayService *si.Service) *hi.Consumer {
+	reader := kafka.NewReader(kafka.ReaderConfig{
+		Brokers:  []string{cfg.KafkaBrokerUrl},
+		Topic:    "tickers",
+		GroupID:  "consumer",
+		MinBytes: 10e3, // 10KB
+		MaxBytes: 10e6, // 10MB
+	})
+
+	return hi.NewConsumer(reader, intradayService)
 }
