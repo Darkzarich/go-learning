@@ -8,10 +8,10 @@ import (
 	"sync"
 	"syscall"
 
-	"consumer/client/storage"
-	"consumer/config"
-	hi "consumer/handler/kafka/intraday"
-	si "consumer/service/intraday"
+	"consumer/internal/client/storage"
+	"consumer/internal/config"
+	hi "consumer/internal/handler/kafka/intraday"
+	si "consumer/internal/service/intraday"
 )
 
 func main() {

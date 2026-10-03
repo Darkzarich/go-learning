@@ -7,15 +7,15 @@ import (
 	"io"
 	"log/slog"
 
-	"consumer/config"
+	"consumer/internal/config"
 
 	kafka "github.com/segmentio/kafka-go"
 
-	"consumer/client/storage"
+	di "consumer/internal/domain/intraday"
 )
 
 type IIntradayService interface {
-	ProcessIntraday(ctx context.Context, intraday storage.Intraday) error
+	ProcessIntraday(ctx context.Context, intraday di.Intraday) error
 }
 
 type Consumer struct {
@@ -42,9 +42,14 @@ func (c *Consumer) Run(ctx context.Context) error {
 	for {
 		msg, err := c.reader.FetchMessage(ctx)
 		if err != nil {
-			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
-				slog.Info("Kafka consumer context cancelled, shutting down")
+			if errors.Is(err, context.DeadlineExceeded) {
+				slog.Info("Context deadline exceeded")
 				return context.DeadlineExceeded
+			}
+
+			if errors.Is(err, context.Canceled) {
+				slog.Info("Context canceled")
+				return context.Canceled
 			}
 
 			if errors.Is(err, io.EOF) {
@@ -55,14 +60,14 @@ func (c *Consumer) Run(ctx context.Context) error {
 			continue
 		}
 
-		var intraday storage.Intraday
+		var intraday IntradayMessage
 
 		if err := json.Unmarshal(msg.Value, &intraday); err != nil {
 			slog.Error("Failed to unmarshal message", "error", err)
 			continue
 		}
 
-		if err := c.svc.ProcessIntraday(ctx, intraday); err != nil {
+		if err := c.svc.ProcessIntraday(ctx, intraday.toDomain()); err != nil {
 			slog.Warn("Failed to process message, skipping", "error", err)
 		}
 
