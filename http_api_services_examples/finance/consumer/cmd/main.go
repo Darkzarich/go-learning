@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"consumer/internal/client/storage"
 	"consumer/internal/config"
@@ -53,7 +55,9 @@ func run(cfg config.Config) error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	Client := storage.NewClient(cfg.StorageUrl)
+	httpClient := &http.Client{Timeout: 5 * time.Second}
+
+	Client := storage.NewClient(httpClient, cfg.StorageUrl)
 
 	intradayService := si.NewService(Client)
 
