@@ -12,7 +12,7 @@ type CreatePayload struct {
 }
 
 type ListFilter struct {
-	TickerID string
+	TickerID int64
 	From     time.Time
 	To       time.Time
 }

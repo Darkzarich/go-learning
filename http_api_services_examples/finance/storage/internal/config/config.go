@@ -6,7 +6,7 @@ import (
 )
 
 type Config struct {
-	Addr        string
+	Port        string
 	DatabaseURL string
 	Env         string
 }
@@ -16,13 +16,13 @@ func Load() (Config, error) {
 	if dsn == "" {
 		return Config{}, errors.New("DATABASE_URL is required")
 	}
-	addr := os.Getenv("HTTP_ADDR")
-	if addr == "" {
-		addr = "8081"
+	port := os.Getenv("HTTP_PORT")
+	if port == "" {
+		port = "8081"
 	}
 	env := os.Getenv("ENV")
 	if env == "" {
 		env = "dev"
 	}
-	return Config{Addr: addr, DatabaseURL: dsn, Env: env}, nil
+	return Config{Port: port, DatabaseURL: dsn, Env: env}, nil
 }

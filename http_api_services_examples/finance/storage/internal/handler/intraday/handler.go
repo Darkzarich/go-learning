@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"time"
 
 	di "storage/internal/domain/intraday"
@@ -72,6 +73,14 @@ func validateAndParseFromTo(from, to string) (time.Time, time.Time, error) {
 		return time.Time{}, time.Time{}, fmt.Errorf("invalid end_date: %w", err)
 	}
 
+	if parsedFrom.After(parsedTo) {
+		return time.Time{}, time.Time{}, errors.New("start_date must be before end_date")
+	}
+
+	if parsedTo.Before(parsedFrom) {
+		return time.Time{}, time.Time{}, errors.New("end_date must be after start_date")
+	}
+
 	return parsedFrom, parsedTo, nil
 }
 
@@ -85,8 +94,18 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var tickerID int64
+	if s := r.PathValue("id"); s != "" {
+		id, err := strconv.ParseInt(s, 10, 64)
+		if err != nil || id <= 0 {
+			writeErr(w, http.StatusBadRequest, "invalid ticker id")
+			return
+		}
+		tickerID = id
+	}
+
 	filter := di.ListFilter{
-		TickerID: r.PathValue("id"),
+		TickerID: tickerID,
 		From:     parsedFrom,
 		To:       parsedTo,
 	}

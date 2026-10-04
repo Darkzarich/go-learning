@@ -72,6 +72,11 @@ func run(cfg config.Config) error {
 	}
 	defer pool.Close()
 
+	if err := pool.Ping(ctx); err != nil {
+		return fmt.Errorf("ping db: %w", err)
+	}
+	slog.Info("connected to database")
+
 	repo := ri.NewPostgresRepo(pool)
 	svc := si.NewService(repo)
 
@@ -88,9 +93,9 @@ func run(cfg config.Config) error {
 		IdleTimeout:       60 * time.Second,
 	}
 
-	ln, err := net.Listen("tcp", ":"+cfg.Addr)
+	ln, err := net.Listen("tcp", ":"+cfg.Port)
 	if err != nil {
-		return fmt.Errorf("listen on port %q: %w", cfg.Addr, err)
+		return fmt.Errorf("listen on port %q: %w", cfg.Port, err)
 	}
 
 	slog.Info("Server is running on " + ln.Addr().String())

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 	"storage/internal/domain/intraday"
-	"strconv"
 	"sync"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -83,13 +82,9 @@ func (r *PostgresRepo) List(ctx context.Context, filter intraday.ListFilter) ([]
 	placeholderIdx := 3
 	var args []any = []any{filter.From, filter.To}
 
-	if filter.TickerID != "" {
-		intTickerID, err := strconv.Atoi(filter.TickerID)
-		if err != nil {
-			return nil, fmt.Errorf("repo list intradays %+v: %w", filter, err)
-		}
+	if filter.TickerID != 0 {
 		baseQuery += fmt.Sprintf(`AND ticker_id = $%d `, placeholderIdx)
-		args = append(args, intTickerID)
+		args = append(args, filter.TickerID)
 		// placeholderIdx++
 	}
 
