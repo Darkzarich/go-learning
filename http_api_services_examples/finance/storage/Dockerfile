@@ -9,5 +9,5 @@ RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /storage ./c
 FROM alpine:3.21
 RUN apk add --no-cache ca-certificates
 COPY --from=builder /storage /storage
-EXPOSE 8081
+EXPOSE 8080
 ENTRYPOINT ["/storage"]

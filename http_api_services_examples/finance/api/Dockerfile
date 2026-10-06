@@ -9,5 +9,5 @@ RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /api ./cmd
 FROM alpine:3.21
 RUN apk add --no-cache ca-certificates
 COPY --from=builder /api /api
-EXPOSE 8082
+EXPOSE 8081
 ENTRYPOINT ["/api"]

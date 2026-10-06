@@ -18,7 +18,7 @@ func Load() (Config, error) {
 	}
 	port := os.Getenv("HTTP_PORT")
 	if port == "" {
-		port = "8081"
+		port = "8080"
 	}
 	env := os.Getenv("ENV")
 	if env == "" {

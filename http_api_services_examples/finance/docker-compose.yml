@@ -18,7 +18,7 @@ services:
         condition: service_healthy
     environment:
       KAFKA_BROKER: kafka:9092
-      STORAGE_URL: http://storage:8081
+      STORAGE_URL: http://storage:8080
 
   storage:
     build: ./storage
@@ -27,10 +27,10 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgres://testuser:qwerty1234@postgres:5432/intradays?sslmode=disable
-      HTTP_PORT: 8081
+      HTTP_PORT: 8080
       ENV: prod
     healthcheck:
-      test: ['CMD-SHELL', 'wget -q -O- http://localhost:8081/health || exit 1']
+      test: ['CMD-SHELL', 'wget -q -O- http://localhost:8080/health || exit 1']
       interval: 10s
       timeout: 10s
       retries: 10
@@ -42,8 +42,9 @@ services:
         condition: service_healthy
     environment:
       STORAGE_URL: http://storage:8081
+      HTTP_PORT: 8081
     ports:
-      - '8082:8082'
+      - '8081:${HTTP_PORT}'
 
   postgres:
     image: postgres:17-alpine
@@ -88,7 +89,7 @@ services:
       kafka:
         condition: service_healthy
     ports:
-      - '8080:8080'
+      - '8082:8082'
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
