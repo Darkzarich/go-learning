@@ -7,15 +7,13 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"strconv"
 	"time"
 
-	di "storage/internal/domain/intraday"
+	di "api/internal/domain/intraday"
 )
 
 type IntradayService interface {
-	Create(ctx context.Context, p *di.CreatePayload) error
-	List(ctx context.Context, filter di.ListFilter) ([]di.Intraday, error)
+	ListIntradays(ctx context.Context, filter di.ListFilter) ([]di.Intraday, error)
 }
 
 type Handler struct {
@@ -27,35 +25,8 @@ func NewHandler(svc IntradayService) *Handler {
 }
 
 func (h *Handler) Routes(mux *http.ServeMux) {
-	mux.HandleFunc("POST /storage/intraday", h.create)
-	mux.HandleFunc("GET /storage/intraday/{id}", h.list)
-	mux.HandleFunc("GET /storage/intraday", h.list)
-}
-
-func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
-	var req createIntradayReq
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeErr(w, http.StatusBadRequest, "invalid json")
-		return
-	}
-
-	err := h.svc.Create(r.Context(), &di.CreatePayload{
-		Ticker:    req.Ticker,
-		Price:     req.Price,
-		Timestamp: req.Timestamp,
-	})
-	if err != nil {
-		if errors.Is(err, di.ErrInvalidInput) {
-			writeErr(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		slog.Error("create intraday", "error", err)
-		writeErr(w, http.StatusInternalServerError, "internal error")
-		return
-	}
-
-	writeJSON(w, http.StatusCreated, createIntradayResp{Message: "OK"})
+	mux.HandleFunc("GET /api", h.list)
+	// mux.HandleFunc("GET /api/{id}", h.list)
 }
 
 func validateAndParseFromTo(from, to string) (time.Time, time.Time, error) {
@@ -73,7 +44,6 @@ func validateAndParseFromTo(from, to string) (time.Time, time.Time, error) {
 		return time.Time{}, time.Time{}, fmt.Errorf("invalid end_date: %w", err)
 	}
 
-	// TODO move this check in service layer because it's a business rule, technically (and do the same for storage service)
 	if parsedFrom.After(parsedTo) {
 		return time.Time{}, time.Time{}, errors.New("start_date must be before end_date")
 	}
@@ -91,25 +61,24 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var tickerID int64
-	if s := r.PathValue("id"); s != "" {
-		id, err := strconv.ParseInt(s, 10, 64)
-		if err != nil || id <= 0 {
-			writeErr(w, http.StatusBadRequest, "invalid ticker id")
-			return
-		}
-		tickerID = id
-	}
+	// var tickerID int64
+	// if s := r.PathValue("id"); s != "" {
+	// 	id, err := strconv.ParseInt(s, 10, 64)
+	// 	if err != nil || id <= 0 {
+	// 		writeErr(w, http.StatusBadRequest, "invalid ticker id")
+	// 		return
+	// 	}
+	// 	tickerID = id
+	// }
 
 	filter := di.ListFilter{
-		TickerID: tickerID,
-		From:     parsedFrom,
-		To:       parsedTo,
+		From: parsedFrom,
+		To:   parsedTo,
 	}
 
 	slog.Debug("list intradays", "filter", filter)
 
-	intradaysFromDB, err := h.svc.List(r.Context(), filter)
+	intradaysFromDB, err := h.svc.ListIntradays(r.Context(), filter)
 	if err != nil {
 		slog.Error("list intradays", "error", err)
 		writeErr(w, http.StatusInternalServerError, "internal error")
@@ -121,7 +90,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 	for _, i := range intradaysFromDB {
 		intradays = append(intradays, getIntradaysResp{
 			TickerID: i.TickerID,
-			Name:     i.Ticker,
+			Name:     i.Name,
 			Price:    i.Price,
 			Time:     i.Timestamp.Format(time.RFC3339),
 		})

@@ -12,6 +12,11 @@ import (
 	"syscall"
 	"time"
 
+	si "api/internal/service/intraday"
+
+	hi "api/internal/handler/intraday"
+
+	"api/internal/client/storage"
 	"api/internal/config"
 )
 
@@ -33,7 +38,15 @@ func run(cfg config.Config) error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	httpClient := &http.Client{Timeout: 5 * time.Second}
+
+	client := storage.NewClient(httpClient, cfg.StorageURL)
+
+	intradayService := si.NewService(client)
+
 	mux := http.NewServeMux()
+
+	hi.NewHandler(intradayService).Routes(mux)
 
 	server := &http.Server{
 		Handler:           mux,
