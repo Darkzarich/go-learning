@@ -30,21 +30,24 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 }
 
 func validateAndParseFromTo(from, to string) (time.Time, time.Time, error) {
-	if from == "" || to == "" {
-		return time.Time{}, time.Time{}, errors.New("start_date and end_date are required")
+	var parsedFrom, parsedTo time.Time
+	var err error
+
+	if from != "" {
+		parsedFrom, err = time.Parse(time.RFC3339, from)
+		if err != nil {
+			return time.Time{}, time.Time{}, fmt.Errorf("invalid start_date: %w", err)
+		}
 	}
 
-	parsedFrom, err := time.Parse(time.RFC3339, from)
-	if err != nil {
-		return time.Time{}, time.Time{}, fmt.Errorf("invalid start_date: %w", err)
+	if to != "" {
+		parsedTo, err = time.Parse(time.RFC3339, to)
+		if err != nil {
+			return time.Time{}, time.Time{}, fmt.Errorf("invalid end_date: %w", err)
+		}
 	}
 
-	parsedTo, err := time.Parse(time.RFC3339, to)
-	if err != nil {
-		return time.Time{}, time.Time{}, fmt.Errorf("invalid end_date: %w", err)
-	}
-
-	if parsedFrom.After(parsedTo) {
+	if !parsedFrom.IsZero() && !parsedTo.IsZero() && parsedFrom.After(parsedTo) {
 		return time.Time{}, time.Time{}, errors.New("start_date must be before end_date")
 	}
 

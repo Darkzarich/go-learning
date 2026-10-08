@@ -31,8 +31,14 @@ func (c *Client) FetchIntradays(ctx context.Context, filter di.ListFilter) ([]di
 	}
 
 	q := req.URL.Query()
-	q.Add("start_date", filter.From.Format(time.RFC3339))
-	q.Add("end_date", filter.To.Format(time.RFC3339))
+
+	if !filter.From.IsZero() {
+		q.Add("start_date", filter.From.Format(time.RFC3339))
+	}
+	
+	if !filter.To.IsZero() {
+		q.Add("end_date", filter.To.Format(time.RFC3339))
+	}
 
 	req.URL.RawQuery = q.Encode()
 
