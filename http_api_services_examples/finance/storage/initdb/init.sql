@@ -13,3 +13,5 @@ CREATE TABLE
   );
 
 CREATE INDEX IF NOT EXISTS idx_intraday_ticker_ts ON intradays (ticker_id, timestamp DESC);
+
+CREATE INDEX IF NOT EXISTS idx_intraday_ts ON intradays (timestamp);
