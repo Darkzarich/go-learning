@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"storage/internal/domain/intraday"
+	"strings"
 	"sync"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -75,17 +76,28 @@ func (r *PostgresRepo) Create(ctx context.Context, p *intraday.CreatePayload) er
 
 func (r *PostgresRepo) List(ctx context.Context, filter intraday.ListFilter) ([]intraday.Intraday, error) {
 	baseQuery := `SELECT i.id as id, t.id as ticker_id, ticker, price, timestamp FROM intradays i
-	JOIN tickers t ON t.id = i.ticker_id
-	WHERE timestamp >= $1 AND timestamp <= $2 `
+	JOIN tickers t ON t.id = i.ticker_id `
 
-	// 3rd placeholder because from and to take 1 and 2 respectively
-	placeholderIdx := 3
-	var args []any = []any{filter.From, filter.To}
+	var conds []string
+	var args []any
 
+	addCond := func(cond string, arg any) {
+		args = append(args, arg)
+		conds = append(conds, fmt.Sprintf(cond, len(args)))
+	}
+
+	if !filter.From.IsZero() {
+		addCond(`timestamp >= $%d`, filter.From)
+	}
+	if !filter.To.IsZero() {
+		addCond(`timestamp <= $%d`, filter.To)
+	}
 	if filter.TickerID != 0 {
-		baseQuery += fmt.Sprintf(`AND ticker_id = $%d `, placeholderIdx)
-		args = append(args, filter.TickerID)
-		// placeholderIdx++
+		addCond(`ticker_id = $%d`, filter.TickerID)
+	}
+
+	if len(conds) > 0 {
+		baseQuery += `WHERE ` + strings.Join(conds, ` AND `) + ` `
 	}
 
 	finalQuery := baseQuery + `ORDER BY ticker, timestamp;`
