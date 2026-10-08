@@ -8,6 +8,7 @@ import (
 type Config struct {
 	Port       string
 	StorageURL string
+	Env        string
 }
 
 func Load() (Config, error) {
@@ -21,5 +22,10 @@ func Load() (Config, error) {
 		return Config{}, errors.New("STORAGE_URL is required")
 	}
 
-	return Config{StorageURL: storageURL, Port: port}, nil
+	env := os.Getenv("ENV")
+	if env == "" {
+		env = "dev"
+	}
+
+	return Config{StorageURL: storageURL, Port: port, Env: env}, nil
 }

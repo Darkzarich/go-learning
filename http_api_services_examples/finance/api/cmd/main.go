@@ -27,10 +27,30 @@ func main() {
 		os.Exit(1)
 	}
 
+	setupSlogger(cfg.Env)
+
 	if err := run(cfg); err != nil {
 		slog.Error("fatal", "error", err)
 		os.Exit(1)
 	}
+}
+
+func setupSlogger(env string) {
+	var logLevel slog.Level
+
+	switch env {
+	case "dev":
+		logLevel = slog.LevelDebug
+	case "prod":
+		logLevel = slog.LevelInfo
+	default:
+		logLevel = slog.LevelDebug
+	}
+
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: logLevel,
+	}))
+	slog.SetDefault(logger)
 }
 
 func run(cfg config.Config) error {
