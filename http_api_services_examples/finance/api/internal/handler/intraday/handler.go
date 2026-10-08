@@ -83,7 +83,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 
 	slog.Debug("list intradays", "filter", filter)
 
-	intradaysFromDB, err := h.svc.ListIntradays(r.Context(), filter)
+	intradays, err := h.svc.ListIntradays(r.Context(), filter)
 	if err != nil {
 		if errors.Is(err, di.ErrRejected) {
 			writeErr(w, http.StatusBadRequest, err.Error())
@@ -95,10 +95,10 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	intradays := make([]getIntradaysResp, 0, len(intradaysFromDB))
+	resp := make([]getIntradaysResp, 0, len(intradays))
 
-	for _, i := range intradaysFromDB {
-		intradays = append(intradays, getIntradaysResp{
+	for _, i := range intradays {
+		resp = append(resp, getIntradaysResp{
 			TickerID: i.TickerID,
 			Name:     i.Name,
 			Price:    i.Price,
@@ -106,7 +106,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	writeJSON(w, http.StatusOK, intradays)
+	writeJSON(w, http.StatusOK, resp)
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) {
