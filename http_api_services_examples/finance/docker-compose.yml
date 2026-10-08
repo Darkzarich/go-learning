@@ -41,10 +41,11 @@ services:
       storage:
         condition: service_healthy
     environment:
-      STORAGE_URL: http://storage:8081
+      STORAGE_URL: http://storage:8080
       HTTP_PORT: 8081
+      ENV: prod
     ports:
-      - '8081:${HTTP_PORT}'
+      - '8081:8081'
 
   postgres:
     image: postgres:17-alpine
