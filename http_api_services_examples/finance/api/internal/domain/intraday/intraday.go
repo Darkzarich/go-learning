@@ -10,6 +10,7 @@ type Intraday struct {
 }
 
 type ListFilter struct {
-	From time.Time
-	To   time.Time
+	TickerID int64
+	From     time.Time
+	To       time.Time
 }

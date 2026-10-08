@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	di "api/internal/domain/intraday"
@@ -25,7 +26,12 @@ func NewClient(httpClient *http.Client, url string) *Client {
 }
 
 func (c *Client) FetchIntradays(ctx context.Context, filter di.ListFilter) ([]di.Intraday, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+"/storage/intraday", nil)
+	url := c.baseURL + "/storage/intraday"
+	if filter.TickerID != 0 {
+		url += "/" + strconv.FormatInt(filter.TickerID, 10)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
@@ -35,7 +41,7 @@ func (c *Client) FetchIntradays(ctx context.Context, filter di.ListFilter) ([]di
 	if !filter.From.IsZero() {
 		q.Add("start_date", filter.From.Format(time.RFC3339))
 	}
-	
+
 	if !filter.To.IsZero() {
 		q.Add("end_date", filter.To.Format(time.RFC3339))
 	}

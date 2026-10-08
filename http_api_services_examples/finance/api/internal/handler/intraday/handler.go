@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"time"
 
 	di "api/internal/domain/intraday"
@@ -26,7 +27,7 @@ func NewHandler(svc IntradayService) *Handler {
 
 func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /api", h.list)
-	// mux.HandleFunc("GET /api/{id}", h.list)
+	mux.HandleFunc("GET /api/{id}", h.list)
 }
 
 func validateAndParseFromTo(from, to string) (time.Time, time.Time, error) {
@@ -64,19 +65,20 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// var tickerID int64
-	// if s := r.PathValue("id"); s != "" {
-	// 	id, err := strconv.ParseInt(s, 10, 64)
-	// 	if err != nil || id <= 0 {
-	// 		writeErr(w, http.StatusBadRequest, "invalid ticker id")
-	// 		return
-	// 	}
-	// 	tickerID = id
-	// }
+	var tickerID int64
+	if s := r.PathValue("id"); s != "" {
+		id, err := strconv.ParseInt(s, 10, 64)
+		if err != nil || id <= 0 {
+			writeErr(w, http.StatusBadRequest, "invalid ticker id")
+			return
+		}
+		tickerID = id
+	}
 
 	filter := di.ListFilter{
-		From: parsedFrom,
-		To:   parsedTo,
+		TickerID: tickerID,
+		From:     parsedFrom,
+		To:       parsedTo,
 	}
 
 	slog.Debug("list intradays", "filter", filter)
