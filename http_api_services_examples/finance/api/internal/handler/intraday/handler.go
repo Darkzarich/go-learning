@@ -85,6 +85,11 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 
 	intradaysFromDB, err := h.svc.ListIntradays(r.Context(), filter)
 	if err != nil {
+		if errors.Is(err, di.ErrRejected) {
+			writeErr(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		slog.Error("list intradays", "error", err)
 		writeErr(w, http.StatusInternalServerError, "internal error")
 		return
