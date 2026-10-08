@@ -46,7 +46,7 @@ func (r *PostgresRepo) Create(ctx context.Context, p *intraday.CreatePayload) er
 		_, err := r.pool.Exec(ctx, `
 			INSERT INTO intradays (ticker_id, price, timestamp)
 			VALUES ($1, $2, $3)
-		`, tickerID, p.Price, p.Timestamp)
+		`, tickerID, p.Price, p.Timestamp.UTC())
 		if err != nil {
 			return fmt.Errorf("repo create intraday for ticker %q: %w", p.Ticker, err)
 		}
@@ -61,7 +61,7 @@ func (r *PostgresRepo) Create(ctx context.Context, p *intraday.CreatePayload) er
 	INSERT INTO intradays (ticker_id, price, timestamp)
 	SELECT id, $2, $3 FROM t
 	RETURNING ticker_id
-`, p.Ticker, p.Price, p.Timestamp).Scan(&tickerID)
+`, p.Ticker, p.Price, p.Timestamp.UTC()).Scan(&tickerID)
 		if err != nil {
 			return fmt.Errorf("repo create intraday for ticker %q: %w", p.Ticker, err)
 		}
@@ -87,10 +87,10 @@ func (r *PostgresRepo) List(ctx context.Context, filter intraday.ListFilter) ([]
 	}
 
 	if !filter.From.IsZero() {
-		addCond(`timestamp >= $%d`, filter.From)
+		addCond(`timestamp >= $%d`, filter.From.UTC())
 	}
 	if !filter.To.IsZero() {
-		addCond(`timestamp <= $%d`, filter.To)
+		addCond(`timestamp <= $%d`, filter.To.UTC())
 	}
 	if filter.TickerID != 0 {
 		addCond(`ticker_id = $%d`, filter.TickerID)
