@@ -33,5 +33,22 @@ func (s *Service) ListIntradays(ctx context.Context, filter di.ListFilter) ([]di
 		return nil, fmt.Errorf("fetch intradays: %w", err)
 	}
 
-	return intradays, nil
+	return lastPerMinute(intradays), nil
+}
+
+func lastPerMinute(trades []di.Intraday) []di.Intraday {
+	result := make([]di.Intraday, 0, len(trades))
+
+	for _, t := range trades {
+		t.Timestamp = t.Timestamp.Truncate(time.Minute)
+
+		if n := len(result); n > 0 && result[n-1].TickerID == t.TickerID && result[n-1].Timestamp.Equal(t.Timestamp) {
+			result[n-1] = t
+			continue
+		}
+
+		result = append(result, t)
+	}
+
+	return result
 }

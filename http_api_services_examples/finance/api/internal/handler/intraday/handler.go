@@ -102,7 +102,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 			TickerID: i.TickerID,
 			Name:     i.Name,
 			Price:    i.Price,
-			Time:     i.Timestamp.Format(time.RFC3339),
+			Time:     i.Timestamp.Format("2006-01-02 15:04"),
 		})
 	}
 
