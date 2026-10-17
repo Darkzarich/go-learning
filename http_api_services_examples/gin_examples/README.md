@@ -46,4 +46,8 @@ curl -H "Accept-Version: v2" "localhost:3000/header-versioning/hello"
 # custom_error - an example of how to use custom error handling middleware
 curl "localhost:3000/custom-error/posts/0"
 curl "localhost:3000/custom-error/posts/1"
+# binding - an example of how to use binding and validation
+curl -X POST -d '{"name": "John", "last_name": "Doe", "age": 30}' "localhost:3000/binding/simple/users"
+curl -X POST -d '{"name": "John", "last_name": "Do", "age": 13}' "localhost:3000/binding/simple/users" # validation error
+curl "localhost:3000/binding/users"
 ```
